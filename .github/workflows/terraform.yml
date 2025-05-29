@@ -34,7 +34,13 @@ jobs:
       run: terraform validate
 
     - name: Plano de execução
-      run: terraform plan
+      run: terraform plan \
+        -var="db_user=${{ secrets.DB_USER }}" \
+        -var="db_password=${{ secrets.DB_PASSWORD }}" \
+        -var="db_name=${{ secrets.DB_NAME }}"
 
     - name: Aplicar (Terraform Apply)
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve \
+        -var="db_user=${{ secrets.DB_USER }}" \
+        -var="db_password=${{ secrets.DB_PASSWORD }}" \
+        -var="db_name=${{ secrets.DB_NAME }}"
