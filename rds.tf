@@ -34,7 +34,7 @@ resource "aws_security_group" "db_sg" {
 resource "aws_db_instance" "fastfood_db" {
   identifier              = "fastfood-db"
   engine                  = "postgres"
-  engine_version          = "15.5"
+  engine_version          = "15.4"
   instance_class          = "db.t3.micro"
   allocated_storage       = 20
   db_name                 = var.db_name
