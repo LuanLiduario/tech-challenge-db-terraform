@@ -16,7 +16,7 @@ resource "aws_security_group" "db_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Acesso liberado
+    cidr_blocks = ["0.0.0.0/0"] # Libera acesso para todos os IPs (atenção em produção)
   }
 
   egress {
@@ -36,9 +36,13 @@ resource "aws_db_instance" "fastfood_db" {
   instance_class       = "db.t3.micro"
   username             = var.db_user
   password             = var.db_password
+  port                 = 5432
   skip_final_snapshot  = true
   publicly_accessible  = true
 
-  db_subnet_group_name    = aws_db_subnet_group.main.name
-  vpc_security_group_ids  = [aws_security_group.db_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db_sg.id]
+
+  # Garante que não será autoconfigurado
+  apply_immediately      = true
 }

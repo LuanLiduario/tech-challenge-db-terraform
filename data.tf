@@ -8,7 +8,10 @@ resource "aws_vpc" "main" {
 
 
 data "aws_vpc" "selected" {
-  id = aws_vpc.main.id
+  filter {
+    name   = "tag:Name"
+    values = [var.vpc_name]
+  }
 }
 
 data "aws_subnets" "selected" {
@@ -20,9 +23,4 @@ data "aws_subnets" "selected" {
   tags = {
     Name = "*-public-*"
   }
-}
-
-data "aws_subnet" "subnet_details" {
-  for_each = toset(data.aws_subnets.selected.ids)
-  id       = each.key
 }
