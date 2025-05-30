@@ -36,6 +36,13 @@ jobs:
     - name: Plano de execução
       run: terraform plan -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
 
+    - name: Tentar importar DB Subnet Group se já existir
+      run: |
+        if aws rds describe-db-subnet-groups --db-subnet-group-name main-subnet-group > /dev/null 2>&1; then
+          terraform import aws_db_subnet_group.main main-subnet-group
+        else
+          echo "DB Subnet Group não existe, prosseguindo com criação"
+        fi
+
     - name: Aplicar (Terraform Apply)
       run: terraform apply -auto-approve -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
-
