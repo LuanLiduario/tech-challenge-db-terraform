@@ -27,7 +27,7 @@ resource "aws_security_group" "db_sg" {
   }
 }
 
-resource "aws_db_instance" "fastfood" {
+resource "aws_db_instance" "fastfood_db" {
   identifier           = "fastfood-db"
   allocated_storage    = 20
   db_name              = var.db_name
