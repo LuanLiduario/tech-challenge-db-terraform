@@ -36,22 +36,5 @@ jobs:
     - name: Plano de execução
       run: terraform plan -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
 
-    - name: Tentar importar DB Subnet Group se já existir
-      continue-on-error: true
-      timeout-minutes: 2
-      run: |
-        echo "🔍 Verificando se o DB Subnet Group 'main-subnet-group' já existe na AWS..."
-        if aws rds describe-db-subnet-groups --db-subnet-group-name main-subnet-group > /dev/null 2>&1; then
-          echo "✅ Existe! Tentando importar para o Terraform..."
-          terraform import \
-            -var="db_user=${{ secrets.DB_USER }}" \
-            -var="db_password=${{ secrets.DB_PASSWORD }}" \
-            -var="db_name=${{ secrets.DB_NAME }}" \
-            -input=false aws_db_subnet_group.main main-subnet-group \
-            || echo "⚠️ Import falhou (pode já estar no state remoto)."
-        else
-          echo "❌ Não existe. Terraform vai criar normalmente no apply."
-        fi
-
     - name: Aplicar (Terraform Apply)
       run: terraform apply -auto-approve -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
