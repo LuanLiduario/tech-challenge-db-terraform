@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout código
+    - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Configurar AWS CLI
+    - name: Setup AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -22,36 +22,16 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Instalar Terraform
+    - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.5.7
 
-    - name: Inicializar Terraform
+    - name: Terraform Init
       run: terraform init
 
-    - name: Validar Terraform
-      run: terraform validate
-
-    - name: Plano de execução
+    - name: Terraform Plan
       run: terraform plan -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
 
-    - name: Tentar importar DB Subnet Group se já existir
-      continue-on-error: true
-      timeout-minutes: 2
-      run: |
-        echo "🔍 Verificando se o DB Subnet Group 'main-subnet-group' já existe na AWS..."
-        if aws rds describe-db-subnet-groups --db-subnet-group-name main-subnet-group > /dev/null 2>&1; then
-          echo "✅ Existe! Tentando importar para o Terraform..."
-          terraform import \
-            -var="db_user=${{ secrets.DB_USER }}" \
-            -var="db_password=${{ secrets.DB_PASSWORD }}" \
-            -var="db_name=${{ secrets.DB_NAME }}" \
-            -input=false aws_db_subnet_group.main main-subnet-group \
-            || echo "⚠️ Import falhou (pode já estar no state remoto)."
-        else
-          echo "❌ Não existe. Terraform vai criar normalmente no apply."
-        fi
-
-    - name: Aplicar (Terraform Apply)
+    - name: Terraform Apply
       run: terraform apply -auto-approve -var="db_user=${{ secrets.DB_USER }}" -var="db_password=${{ secrets.DB_PASSWORD }}" -var="db_name=${{ secrets.DB_NAME }}"
