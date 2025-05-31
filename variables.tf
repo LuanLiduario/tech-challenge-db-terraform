@@ -1,5 +1,5 @@
 variable "vpc_name" {
-  default = "main-vpc"
+  default = "fiap-vpc"
   description = "Nome da VPC onde o banco será provisionado"
   type        = string
 }
