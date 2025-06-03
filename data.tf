@@ -14,4 +14,5 @@ data "aws_subnets" "selected" {
   tags = {
     Name = "*public*"
   }
+
 }
